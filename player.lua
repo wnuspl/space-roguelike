@@ -1,3 +1,4 @@
+MAX_LIVES = 5
 PLR_LEFT_SPRITE = 1
 PLR_DOWN_SPRITE = 17
 PLR_UP_SPRITE = 16
@@ -9,7 +10,8 @@ function create_plr()
 		y=20,
 		w=8,
 		h=8,
-		direction=0
+		direction=0,
+		lives=MAX_LIVES-2
 	}
 end
 
@@ -30,6 +32,17 @@ function update_plr(sys)
 		room = sys.room_list[sys.crnt_room]
 
 	end
+
+
+	for _, p in pairs(room.pickups) do
+		if check_rects_intersect(sys.plr, p) then
+			if p.id == HEART_ID then
+				plr.lives = min(plr.lives+1, MAX_LIVES)
+			end
+			del(room.pickups, p)
+		end	
+	end
+
 
 	local dx = 0 ; local dy = 0
 	if (btn(0)) dx -= 1

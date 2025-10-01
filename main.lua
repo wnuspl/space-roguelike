@@ -25,4 +25,5 @@ function _draw()
 	local room = system.room_list[system.crnt_room]
 	draw_room(room)
 	draw_plr(system)
+	draw_ui(system)
 end
