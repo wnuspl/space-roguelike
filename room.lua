@@ -19,7 +19,7 @@ function create_room(mapx,mapy)
 		mapx=mapx,
 		mapy=mapy,
 		enter_tiles = enter_tiles,
-		links = {}
+		links = {[0]=nil,nil,nil,nil}
 	}
 end
 
@@ -28,15 +28,29 @@ function clone_room(room)
 		mapx=room.mapx,
 		mapy=room.mapy,
 		enter_tiles = room.enter_tiles,
-		links = {}
+		links = {[0]=nil,nil,nil,nil}
 	}
 end
 
+function enter_room(sys, idx, enter_side)
+	local room = sys.room_list[idx]
+	sys.crnt_room = idx
+	sys.plr.x = room.enter_tiles[enter_side].x*8
+	sys.plr.y = room.enter_tiles[enter_side].y*8
+end
 
-function next_room(sys, exit_side)
-	local possible_rooms = {}
+
+function enter_next_room(sys, exit_side)
 	local enter_side = ENTER_EXIT_PAIRS[exit_side]
-	print(enter_side)
+
+	local linked_room = sys.room_list[sys.crnt_room].links[exit_side]
+	if linked_room != nil then
+		print("thers a link")
+		enter_room(sys, linked_room, enter_side)
+		return
+	end
+
+	local possible_rooms = {}
 	for i,room in pairs(sys.room_source) do
 		if room.enter_tiles[enter_side] != nil then
 			add(possible_rooms, i)
@@ -45,6 +59,11 @@ function next_room(sys, exit_side)
 
 	if (#possible_rooms == 0) return nil	
 
-	return clone_room(sys.room_source[rnd(possible_rooms)])
+
+
+	add(sys.room_list, clone_room(sys.room_source[rnd(possible_rooms)]))
+	sys.room_list[sys.crnt_room].links[exit_side] = #sys.room_list
+	sys.room_list[#sys.room_list].links[enter_side] = sys.crnt_room
+	enter_room(sys, #sys.room_list, enter_side)
 end
 

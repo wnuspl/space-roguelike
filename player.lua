@@ -26,16 +26,9 @@ function update_plr(sys)
 		if (ty == 0) exit_side = 2
 		if (ty == 15) exit_side = 3
 
+		enter_next_room(sys, exit_side)
+		room = sys.room_list[sys.crnt_room]
 
-		room = next_room(sys, exit_side)
-		if room != nil then
-			add(sys.room_list, room)
-			sys.crnt_room = #sys.room_list
-
-			plr.x = room.enter_tiles[ENTER_EXIT_PAIRS[exit_side]].x*8
-			plr.y = room.enter_tiles[ENTER_EXIT_PAIRS[exit_side]].y*8
-			
-		end
 	end
 
 	local dx = 0 ; local dy = 0
