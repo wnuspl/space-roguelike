@@ -29,7 +29,7 @@ function clone_room(room)
 		mapx=room.mapx,
 		mapy=room.mapy,
 		enter_tiles = room.enter_tiles,
-		pickup = {},
+		pickups = {},
 		links = {[0]=nil,nil,nil,nil}
 	}
 end
@@ -66,7 +66,7 @@ function enter_next_room(sys, exit_side)
 	add(sys.room_list, clone_room(sys.room_source[rnd(possible_rooms)]))
 	sys.room_list[sys.crnt_room].links[exit_side] = #sys.room_list
 	sys.room_list[#sys.room_list].links[enter_side] = sys.crnt_room
-	generate_pickups(sys.room_list[#sys.room_list], 6)
+	generate_pickups(sys.room_list[#sys.room_list], 10)
 	enter_room(sys, #sys.room_list, enter_side)
 end
 
@@ -75,19 +75,23 @@ end
 function draw_room(room)
 	map(room.mapx*16, room.mapy*16)
 	for _,p in pairs(room.pickups) do
-		draw_pickup(p, room.mapx, room.mapy)
+		draw_pickup(p)
 	end
 end
 
 
 
 
-AVAILABLE_PICKUPS = {HEART_ID}
 function generate_pickups(room, max)
-	local c = rnd(0,max)
+	if not room.pickups then room.pickups = {} end
+	local c = flr(rnd(max+1))
 
-	for i=0,c do
-		local x,y = rnd(1,14), rnd(1,14)
+	for i=1,c do
+		local x,y
+		repeat
+			x = flr(rnd(14)+1)
+			y = flr(rnd(14)+1)
+		until not fget(mget(x+room.mapx*16, y+room.mapy*16), 0)
 		add(room.pickups, create_pickup(rnd(AVAILABLE_PICKUPS), x,y))
 	end
 end
