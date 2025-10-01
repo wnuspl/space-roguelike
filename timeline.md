@@ -1,11 +1,21 @@
 # todo
-1. implement player controls
-2. sprite rotation with animated sprite
-3. try >8 px sprite
-4. create pickup system
-5. create room system
-6. create room gen system
 
-# also
-1. add basic player attack (leave room for expansion)
-2. add aliens
+## aliens
+- add alien to room
+- add basic ai
+- add drops
+- add advanced ai/ranged attacks
+- make cool sprites
+
+## rooms
+- systems for alien spawning/pickups
+- doors closing (adding clear state)
+- figure out if rotating is possible
+- if so, rotate
+- sprites with variation between rooms
+
+## player
+- basic gun (with projectile)
+- add collisions with aliens
+- cooler guns
+- dash

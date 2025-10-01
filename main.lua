@@ -8,6 +8,7 @@ system = {
 function _init()
 	system.plr = create_plr()
 	add(system.room_list, create_room(0,0))
+	generate_pickups(system.room_list[1], 3)
 	add(system.room_source, create_room(0,0))
 	add(system.room_source, create_room(1,0))
 	add(system.room_source, create_room(2,0))
@@ -20,8 +21,8 @@ function _update60()
 end
 
 function _draw()
-	cls(0)
+	--cls(0)
 	local room = system.room_list[system.crnt_room]
-	map(room.mapx*16, room.mapy*16)
+	draw_room(room)
 	draw_plr(system)
 end
