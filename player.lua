@@ -11,7 +11,10 @@ function create_plr()
 		w=8,
 		h=8,
 		direction=0,
-		lives=MAX_LIVES-2
+		lives=MAX_LIVES,
+		coins=0,
+		iframes=0,
+		projectiles = {}
 	}
 end
 
@@ -33,14 +36,32 @@ function update_plr(sys)
 
 	end
 
+	plr.iframes = max(plr.iframes-1,0)
+
 
 	for _, p in pairs(room.pickups) do
 		if check_rects_intersect(sys.plr, p) then
 			if p.id == HEART_ID then
 				plr.lives = min(plr.lives+1, MAX_LIVES)
 			end
+			if p.id == COIN_ID then
+				plr.coins += 1
+			end
 			del(room.pickups, p)
 		end	
+	end
+	for _, a in pairs(room.aliens) do
+		if check_rects_intersect(sys.plr, a) then
+			if plr.iframes == 0 then
+				plr.lives -= 1
+				plr.iframes=30
+			end
+		end	
+	end
+	for _, p in pairs(plr.projectiles) do
+		if update_projectile(p, sys) then
+			del(plr.projectiles, p)
+		end
 	end
 
 
@@ -50,6 +71,16 @@ function update_plr(sys)
 	if (btn(2)) dy -= 1
 	if (btn(3)) dy += 1
 
+	if btnp(4) then
+		local pdx,pdy = 0,0
+		local ox, oy = 0,0
+		if (plr.direction == 0) pdx = -2 oy=4 ox=-8
+		if (plr.direction == 1) pdx = 2 oy=4 ox=8
+		if (plr.direction == 2) pdy = -2 oy=-8
+		if (plr.direction == 3) pdy = 2 oy=8 ox=5
+		
+		add(plr.projectiles, create_projectile(plr.x+ox, plr.y+oy,pdx,pdy))
+	end
 
 	--normalize movement vector
 	local magnitude = sqrt(dx^2 + dy^2)
@@ -86,4 +117,48 @@ function draw_plr(sys)
 	spr(n, sys.plr.x, sys.plr.y, 1, 1, flipx)	
 
 	palt()
+
+	for _, p in pairs(sys.plr.projectiles) do
+		draw_projectile(p)
+	end
+end
+
+
+
+function create_projectile(x,y, dx,dy)
+	return {
+		x=x,
+		y=y,
+		dx=dx,
+		dy=dy,
+		w=8,
+		h=3
+	}
+end
+function update_projectile(projectile, sys)
+	local room = sys.room_list[sys.crnt_room]
+
+
+	projectile.x += projectile.dx
+	projectile.y += projectile.dy	
+
+	if is_map_solid(projectile.x, projectile.y, room.mapx, room.mapy) or
+	   is_map_solid(projectile.x+projectile.w, projectile.y+projectile.h, room.mapx, room.mapy) then
+		return 1;
+	end
+
+
+
+	for _,a in pairs(room.aliens) do
+		if check_rects_intersect(projectile, a) then
+			kill_alien(a, room)
+		end
+	end
+
+end
+
+function draw_projectile(projectile)
+	n = 18
+	if (projectile.dx == 0) n = 20
+	spr(n, projectile.x, projectile.y)
 end

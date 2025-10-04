@@ -9,6 +9,8 @@ function draw_ui(sys)
 		if (sys.plr.lives >= i) n = RED_HEART
 		spr(n, (HEART_SPACING+8)*i, HEART_SPACING)
 	end
+	spr(COIN_ID, (1+MAX_LIVES)*8+8, HEART_SPACING)
+	print(sys.plr.coins, (2+MAX_LIVES)*8+10, HEART_SPACING+1, 0)
 	palt()
 end
 

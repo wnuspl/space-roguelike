@@ -20,6 +20,7 @@ function create_room(mapx,mapy)
 		mapy=mapy,
 		enter_tiles = enter_tiles,
 		pickups = {},
+		aliens = {},
 		links = {[0]=nil,nil,nil,nil}
 	}
 end
@@ -30,8 +31,15 @@ function clone_room(room)
 		mapy=room.mapy,
 		enter_tiles = room.enter_tiles,
 		pickups = {},
+		aliens = {},
 		links = {[0]=nil,nil,nil,nil}
 	}
+end
+
+function update_room(room)
+	for _, alien in pairs(room.aliens) do
+		update_alien(alien, room)
+	end
 end
 
 function enter_room(sys, idx, enter_side)
@@ -66,24 +74,44 @@ function enter_next_room(sys, exit_side)
 	add(sys.room_list, clone_room(sys.room_source[rnd(possible_rooms)]))
 	sys.room_list[sys.crnt_room].links[exit_side] = #sys.room_list
 	sys.room_list[#sys.room_list].links[enter_side] = sys.crnt_room
-	generate_pickups(sys.room_list[#sys.room_list], 10)
+	generate_pickups(sys.room_list[#sys.room_list], 2)
+	generate_aliens(sys.room_list[#sys.room_list], 4)
 	enter_room(sys, #sys.room_list, enter_side)
 end
 
 
 
 function draw_room(room)
+	palt(0,false)
+	palt(2,true)
 	map(room.mapx*16, room.mapy*16)
 	for _,p in pairs(room.pickups) do
 		draw_pickup(p)
+	end
+	for _,a in pairs(room.aliens) do
+		draw_alien(a)
+	end
+
+	palt()
+end
+
+
+function generate_aliens(room, max)
+	local c = flr(rnd(max+1))
+
+	for i=1,c do
+		local x,y
+		repeat
+			x = flr(rnd(14)+1)
+			y = flr(rnd(14)+1)
+		until not fget(mget(x+room.mapx*16, y+room.mapy*16), 0)
+		add(room.aliens, create_alien(x*8,y*8))
 	end
 end
 
 
 
-
 function generate_pickups(room, max)
-	if not room.pickups then room.pickups = {} end
 	local c = flr(rnd(max+1))
 
 	for i=1,c do
