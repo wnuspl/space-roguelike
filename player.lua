@@ -1,7 +1,7 @@
 MAX_LIVES = 5
-PLR_LEFT_SPRITE = 1
-PLR_DOWN_SPRITE = 17
-PLR_UP_SPRITE = 16
+PLR_LEFT_SPRITE = {1, 23}
+PLR_DOWN_SPRITE = {17, 24}
+PLR_UP_SPRITE = {16, 25}
 PLR_SPEED = 1
 
 function create_plr()
@@ -14,7 +14,8 @@ function create_plr()
 		lives=MAX_LIVES,
 		coins=0,
 		iframes=0,
-		projectiles = {}
+		projectiles = {},
+		weapon=create_pew()
 	}
 end
 
@@ -114,7 +115,7 @@ function draw_plr(sys)
 	if (sys.plr.direction==2) n = PLR_UP_SPRITE
 	if (sys.plr.direction==3) n = PLR_DOWN_SPRITE
 
-	spr(n, sys.plr.x, sys.plr.y, 1, 1, flipx)	
+	spr(n[sys.plr.weapon.id], sys.plr.x, sys.plr.y, 1, 1, flipx)	
 
 	palt()
 
