@@ -14,8 +14,7 @@ function create_plr()
 		lives=MAX_LIVES,
 		coins=0,
 		iframes=0,
-		projectiles = {},
-		weapon=create_pew()
+		weapon=create_laserbeam()
 	}
 end
 
@@ -59,11 +58,8 @@ function update_plr(sys)
 			end
 		end	
 	end
-	for _, p in pairs(plr.projectiles) do
-		if update_projectile(p, sys) then
-			del(plr.projectiles, p)
-		end
-	end
+
+	plr.weapon.update(plr.weapon, sys)
 
 
 	local dx = 0 ; local dy = 0
@@ -72,16 +68,6 @@ function update_plr(sys)
 	if (btn(2)) dy -= 1
 	if (btn(3)) dy += 1
 
-	if btnp(4) then
-		local pdx,pdy = 0,0
-		local ox, oy = 0,0
-		if (plr.direction == 0) pdx = -2 oy=4 ox=-8
-		if (plr.direction == 1) pdx = 2 oy=4 ox=8
-		if (plr.direction == 2) pdy = -2 oy=-8
-		if (plr.direction == 3) pdy = 2 oy=8 ox=5
-		
-		add(plr.projectiles, create_projectile(plr.x+ox, plr.y+oy,pdx,pdy))
-	end
 
 	--normalize movement vector
 	local magnitude = sqrt(dx^2 + dy^2)
@@ -105,61 +91,41 @@ end
 
 
 function draw_plr(sys)
+	sys.plr.weapon.draw(sys.plr.weapon, sys)
+	local sprite_var = 0
+
+	if sys.plr.weapon.id == 2 then
+		if sys.plr.weapon.shoot_duration > 0 then
+			sys.plr.direction = sys.plr.weapon.locked_direction
+			sprite_var = 19
+		end
+		if sys.plr.weapon.charge > CHARGE_TIME then
+			sprite_var = 19
+		end
+	end
+
+
 	palt(0,false)
 	palt(2,true)
 
 	--get rotated sprite
-	local n = PLR_LEFT_SPRITE
+	n = PLR_LEFT_SPRITE
 	local flipx = false
 	if (sys.plr.direction==0) flipx = true
 	if (sys.plr.direction==2) n = PLR_UP_SPRITE
 	if (sys.plr.direction==3) n = PLR_DOWN_SPRITE
 
-	spr(n[sys.plr.weapon.id], sys.plr.x, sys.plr.y, 1, 1, flipx)	
+
+	n = n[sys.plr.weapon.id] + sprite_var
+
+
+	spr(n, sys.plr.x, sys.plr.y, 1, 1, flipx)	
 
 	palt()
 
-	for _, p in pairs(sys.plr.projectiles) do
-		draw_projectile(p)
-	end
+
+
 end
 
 
 
-function create_projectile(x,y, dx,dy)
-	return {
-		x=x,
-		y=y,
-		dx=dx,
-		dy=dy,
-		w=8,
-		h=3
-	}
-end
-function update_projectile(projectile, sys)
-	local room = sys.room_list[sys.crnt_room]
-
-
-	projectile.x += projectile.dx
-	projectile.y += projectile.dy	
-
-	if is_map_solid(projectile.x, projectile.y, room.mapx, room.mapy) or
-	   is_map_solid(projectile.x+projectile.w, projectile.y+projectile.h, room.mapx, room.mapy) then
-		return 1;
-	end
-
-
-
-	for _,a in pairs(room.aliens) do
-		if check_rects_intersect(projectile, a) then
-			kill_alien(a, room)
-		end
-	end
-
-end
-
-function draw_projectile(projectile)
-	n = 18
-	if (projectile.dx == 0) n = 20
-	spr(n, projectile.x, projectile.y)
-end
