@@ -9,6 +9,8 @@ function create_projectile(x,y, dx,dy)
 	}
 end
 
+PEW_PROJ_SPEED = 3
+
 function create_pew()
 	local out = {
 		id=1,
@@ -21,12 +23,12 @@ function create_pew()
 		if btnp(4) then
 			local pdx,pdy = 0,0
 			local ox, oy = 0,0
-			if (sys.plr.direction == 0) pdx = -2 oy=4 ox=-8
-			if (sys.plr.direction == 1) pdx = 2 oy=4 ox=8
-			if (sys.plr.direction == 2) pdy = -2 oy=-8
-			if (sys.plr.direction == 3) pdy = 2 oy=8 ox=5
+			if (sys.plr.direction == 0) pdx = -1 oy=4 ox=-8
+			if (sys.plr.direction == 1) pdx = 1 oy=4 ox=8
+			if (sys.plr.direction == 2) pdy = -1 oy=-8
+			if (sys.plr.direction == 3) pdy = 1 oy=8 ox=5
 			
-			add(this.projectiles, create_projectile(sys.plr.x+ox, sys.plr.y+oy,pdx,pdy))
+			add(this.projectiles, create_projectile(sys.plr.x+ox, sys.plr.y+oy,pdx*PEW_PROJ_SPEED,pdy*PEW_PROJ_SPEED))
 		end
 
 		for _, projectile in pairs(this.projectiles) do
@@ -38,7 +40,7 @@ function create_pew()
 
 			if is_map_solid(projectile.x, projectile.y, room.mapx, room.mapy) or
 			   is_map_solid(projectile.x+projectile.w, projectile.y+projectile.h, room.mapx, room.mapy) then
-				return 1;
+				del(this.projectiles, projectile)
 			end
 
 
@@ -169,4 +171,4 @@ end
 
 
 
-	
+AVAILABLE_WEAPONS = {create_laserbeam(), create_pew()}	

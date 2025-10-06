@@ -14,7 +14,7 @@ function create_plr()
 		lives=MAX_LIVES,
 		coins=0,
 		iframes=0,
-		weapon=create_laserbeam()
+		weapon=AVAILABLE_WEAPONS[1]
 	}
 end
 
@@ -67,6 +67,11 @@ function update_plr(sys)
 	if (btn(1)) dx += 1
 	if (btn(2)) dy -= 1
 	if (btn(3)) dy += 1
+
+	if (btnp(5)) then
+		plr.weapon = rnd(AVAILABLE_WEAPONS)
+	end
+		
 
 
 	--normalize movement vector
